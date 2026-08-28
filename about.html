@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>about · Prarthana's corner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+  <!-- quiet visitor count — invisible to readers, you see it at prarthana.goatcounter.com -->
+  <script data-goatcounter="https://prarthana.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body style="--accent:var(--mustard)">
+  <!-- accent = mustard, the "about me" colour -->
+
+<header class="site-head">
+  <a class="wordmark" href="index.html">Prarthana's corner</a>
+  <nav class="site-nav">
+    <a href="index.html">home</a>
+    <a href="about.html" class="active">about</a>
+    <a href="thoughts.html">thoughts</a>
+    <a href="books.html">books</a>
+    <a href="voices.html">voices</a>
+    <a href="stories.html">stories</a>
+  </nav>
+</header>
+
+<main>
+
+  <!-- hello + the rotating photos -->
+  <section class="page">
+    <div class="wrap">
+      <div class="about-grid">
+
+        <div class="photo-show" id="show">
+          <div class="slides">
+            <img src="photos/about-1.jpg" alt="one photo of me" class="slide on">
+            <img src="photos/about-2.jpg" alt="another photo of me" class="slide">
+          </div>
+          <button class="s-btn s-prev" id="prev" aria-label="previous photo">←</button>
+          <button class="s-btn s-next" id="next" aria-label="next photo">→</button>
+          <div class="dots" id="dots"></div>
+        </div>
+
+        <div class="about-text">
+          <h2 class="taped" style="--tape:var(--mustard)">about me</h2>
+          <p class="lead" style="font-family:'Baloo 2',cursive;font-weight:600;font-size:1.4rem;">hi, I'm Prarthana —</p>
+          <p>a girl who tends to think about things for far longer than necessary.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- the story -->
+  <section class="section">
+    <div class="wrap">
+      <div class="story">
+
+        <h2 class="taped" style="--tape:var(--mustard)">why this corner exists</h2>
+        <p class="lead">because some thoughts don't feel finished when they leave your head.</p>
+        <p>Sometimes I read something, notice something, hear someone's story, or experience something completely ordinary — and somehow it stays with me. So I started putting those things here.</p>
+        <p>I'm studying Information Technology, which means I spend a lot of my calendar around code and computers. But out here, I'm mostly into stories, ideas, people, art, and the strange little things that make us human. This place is my way of living a little beyond the code — and maybe, somewhere in the middle, finding a few people I can resonate with, and who can resonate back.</p>
+
+        <div class="pull">"I don't believe a mind only ever thinks about one thing. Niche-finding is a journey, and not everything has to be sorted or perfect."</div>
+
+        <h2 class="taped" style="--tape:var(--mustard)">what I'll write about</h2>
+        <p>Honestly? Very random things. Whatever shows up on a random day — a thought, a song, a stranger's face, a question my brain refuses to let go — if it stays with me, it earns a seat here. Some posts will be half-finished ideas. That's allowed.</p>
+
+        <h2 class="taped" style="--tape:var(--mustard)">what I hope you feel</h2>
+        <p>Seen. Heard. Maybe that you got a piece of advice right when you needed it. I hope you find things here you can relate to — and I hope you understand that you're not alone in your hidden battles. If ever you want to express yourself too, there's room for that here.</p>
+
+        <div class="pull">"You're not alone in your hidden battles."</div>
+
+        <h2 class="taped" style="--tape:var(--mustard)">what I hope this becomes</h2>
+        <p>A café. You know the kind — where you sit with a coffee, take slow sips, and just think about your life, or read a book and resonate with the character. I want this corner to be that safe, comforting place for everyone who visits: a seat, a warm drink, and permission to pause.</p>
+        <p class="lead" style="margin-top:26px;">Take a cup. Stay a while. Wander back whenever.</p>
+        <p><a class="btn" href="index.html">wander back home →</a></p>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <p class="tag">thanks for stopping by</p>
+  <a href="mailto:prarthana2678@gmail.com">say hi → prarthana2678@gmail.com</a>
+  <p class="foot-line">right now — drinking tea, thinking in circles, underlining books.</p>
+</footer>
+
+<script>
+  // the little four-photo flip (two for now)
+  const slides = document.querySelectorAll('.slide');
+  const dotsBox = document.getElementById('dots');
+  let i = 0;
+
+  slides.forEach((_, n) => {
+    const d = document.createElement('button');
+    d.className = 'dot' + (n === 0 ? ' on' : '');
+    d.addEventListener('click', () => show(n));
+    dotsBox.appendChild(d);
+  });
+  const dots = dotsBox.children;
+
+  function show(n){
+    slides[i].classList.remove('on');
+    dots[i].classList.remove('on');
+    i = (n + slides.length) % slides.length;
+    slides[i].classList.add('on');
+    dots[i].classList.add('on');
+  }
+
+  document.getElementById('prev').addEventListener('click', () => show(i - 1));
+  document.getElementById('next').addEventListener('click', () => show(i + 1));
+  setInterval(() => show(i + 1), 4000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,342 @@
+/* ============================================================
+   Prarthana's corner · style.css
+   The one shared stylesheet. Every page links this file, so
+   the whole site shares one identity — same fonts, same lines,
+   same cozy palette. Each room just changes --accent.
+   ============================================================ */
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+/* ---------- the palette (lives here once) ---------- */
+:root{
+  --paper:#F4ECDD;    /* page background — warm paper */
+  --cream:#F8EFE1;    /* cards, bubbles, header */
+  --paw:#F3E4CE;      /* light cream — hovers */
+  --ink:#3E2C1E;      /* main text — dark cocoa */
+  --fur:#CE6E3C;      /* Nox's fur — the red accent */
+  --fur-d:#B25628;    /* darker fox fur */
+  --cup:#3E8E86;      /* teal coffee — secondary accent */
+  --cup-d:#2F6E68;    /* darker teal */
+  --lid:#EAD9BE;      /* soft sand — borders & dashes */
+  --cheek:#E88E77;    /* blush pink */
+  --mustard:#D8A33F;  /* mustard */
+  --steam:#B9A98F;    /* muted tan — small labels */
+
+  --accent: var(--cup);   /* default accent (teal). Rooms change this. */
+  --card-border:#e2d2b4;  /* soft line for card edges */
+  --faint:#a08f76;        /* quiet secondary text */
+}
+
+/* ---------- base ---------- */
+html{ scroll-behavior:smooth; }
+
+body{
+  font-family:'Nunito',sans-serif;
+  font-size:16px;
+  line-height:1.6;
+  color:var(--ink);
+  background:var(--paper);
+}
+
+h1,h2,h3,.display{ font-family:'Baloo 2',cursive; font-weight:700; line-height:1.15; }
+
+a{ color:var(--accent); }
+
+/* ---------- main layout wrapper ---------- */
+.wrap{ max-width:1020px; margin:0 auto; padding:0 24px; }
+main{ display:block; }
+
+/* ---------- top bar ---------- */
+.site-head{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:8px 16px;
+  padding:12px 24px;
+  background:var(--cream);
+  border-bottom:3px dashed var(--lid);
+}
+
+/* small fur-colour dot in front of the name = Nox's paw print */
+.wordmark{
+  font-family:'Baloo 2',cursive; font-weight:700; font-size:1.15rem;
+  color:var(--ink); text-decoration:none;
+}
+.wordmark::before{
+  content:""; display:inline-block; width:12px; height:12px;
+  border-radius:50%; background:var(--fur); margin-right:8px;
+}
+
+.site-nav{ display:flex; flex-wrap:wrap; gap:6px; }
+.site-nav a{
+  color:var(--ink); text-decoration:none; font-weight:600; font-size:.92rem;
+  padding:6px 13px; border-radius:16px;
+}
+.site-nav a:hover{ background:var(--paw); }
+/* highlight the page you're on */
+.site-nav a.active{ background:var(--accent); color:#fff; }
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-block;
+  font-family:'Nunito',sans-serif; font-weight:700; font-size:.95rem;
+  color:#fff; background:var(--accent);
+  padding:10px 20px; border-radius:24px; text-decoration:none;
+  transition:transform .15s ease, filter .15s ease;
+}
+.btn:hover{ transform:translateY(-2px); filter:brightness(1.06); }
+
+/* ---------- section titles (washi-tape scrapbook strip) ---------- */
+.section{ padding:54px 0; }
+.section + .section{ border-top:3px dashed var(--lid); }
+
+.taped{
+  display:inline-block;
+  padding:3px 18px; border-radius:4px;
+  background:var(--tape, var(--fur));
+  color:#fff; font-size:1.05rem; letter-spacing:.2px;
+  transform:rotate(-1.2deg);
+  box-shadow:0 1px 3px rgba(62,44,30,.18);
+  margin-bottom:26px;
+}
+.section-blurb{ color:#6d5b45; max-width:56ch; margin-bottom:26px; }
+
+/* ---------- photo hero on the homepage ---------- */
+.hero{
+  padding:64px 0 48px;
+  background:
+    radial-gradient(circle at 6% 110%, rgba(206,110,60,.10), transparent 42%),
+    radial-gradient(circle at 96% 0%,  rgba(62,142,134,.12),  transparent 46%);
+}
+.hero .wrap{ display:flex; align-items:center; justify-content:space-between; gap:44px; flex-wrap:wrap; }
+.hero-text{ flex:1 1 320px; }
+.hero-text h1{ font-size:clamp(2.1rem,6vw,3.1rem); }
+.hero-text .hello{ color:var(--cup); }
+.tagline{
+  font-family:'Baloo 2',cursive; font-weight:600; font-size:1.15rem;
+  color:var(--fur-d); margin-top:8px;
+}
+.bio{ margin-top:14px; color:#6d5b45; max-width:46ch; }
+.hero .btn{ margin-top:24px; }
+
+/* the photo card slides in from the right once the intro reveals */
+.photo{ flex:0 1 460px; transform:translateX(70px); opacity:0;
+  transition:transform .9s ease .25s, opacity .9s ease .25s; }
+body.revealed .photo{ transform:none; opacity:1; }
+
+/* tiny Nox stands beside the big frame */
+.photo-stage{ display:flex; align-items:flex-end; gap:8px; }
+.mini-fox{ width:62px; height:auto; flex:0 0 auto; margin-bottom:34px; }
+
+.photo-card{
+  position:relative; flex:1 1 auto;
+  background:#fff;
+  padding:14px 14px 48px; border-radius:8px;
+  box-shadow:0 10px 24px rgba(62,44,30,.18);
+  transform:rotate(2deg);
+}
+.photo-card img{ width:100%; height:auto; display:block; border-radius:4px;
+  aspect-ratio:4/3; object-fit:cover; }
+.photo-caption{
+  position:absolute; left:0; right:0; bottom:14px; text-align:center;
+  font-family:'Baloo 2',cursive; font-weight:600; font-size:.92rem; color:var(--ink);
+}
+.photo-tape{
+  position:absolute; top:-14px; left:50%;
+  width:112px; height:28px;
+  background:var(--mustard); opacity:.85; border-radius:3px;
+  transform:translateX(-50%) rotate(-4deg);
+}
+/* note hiding at the very top of the DOM, revealed once --shownote is set */
+.photo-note{ display:none; }
+
+/* ---------- latest peek cards ---------- */
+.cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr)); gap:16px; }
+.card{
+  background:var(--cream); border:2px solid var(--card-border); border-radius:16px;
+  padding:20px 18px; text-decoration:none; color:var(--ink);
+  box-shadow:0 3px 8px rgba(62,44,30,.07);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.card:hover{ transform:translateY(-4px); box-shadow:0 8px 16px rgba(62,44,30,.12); }
+.card .room{
+  font-family:'Baloo 2',cursive; font-weight:700; font-size:.78rem; letter-spacing:.4px;
+  text-transform:lowercase; color:var(--room, var(--cup));
+}
+.card .post{ margin-top:8px; font-weight:600; }
+.card .soon{ font-size:.85rem; color:var(--faint); margin-top:8px; }
+
+/* ---------- room guide / navigation guide ---------- */
+.guide .wrap{ display:flex; align-items:flex-start; gap:30px; flex-wrap:wrap; }
+.guide-side{ flex:1 1 220px; max-width:260px; }
+.guide-side .section-blurb{ margin-bottom:0; }
+.guide-rooms{ flex:2 1 400px; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
+
+.room-card{
+  background:var(--cream); border:2px solid var(--card-border); border-radius:16px;
+  padding:20px 18px; text-decoration:none; color:var(--ink);
+  box-shadow:0 3px 8px rgba(62,44,30,.07);
+  transition:transform .15s ease, background .15s ease;
+}
+.room-card:hover{ transform:translateY(-4px) rotate(-.5deg); background:#fff; }
+.room-card .dot{ display:inline-block; width:11px; height:11px; border-radius:50%; background:var(--room, var(--fur)); margin-right:7px; }
+.room-card h3{ font-size:1.05rem; margin-bottom:4px; }
+.room-card p{ font-size:.88rem; color:#6d5b45; }
+
+/* the little fox peeking beside the guide */
+.nox-flag{ margin-top:14px; font-family:'Baloo 2',cursive; font-weight:600; font-size:.95rem; color:var(--fur-d); }
+.nox-flag svg{ width:74px; height:auto; display:block; margin-bottom:6px; }
+
+/* ---------- the about page ---------- */
+.page{ padding:58px 0; }
+.about-grid{ display:flex; align-items:flex-start; gap:48px; flex-wrap:wrap; }
+.about-text{ flex:1 1 320px; }
+.about-text h2{ font-size:2rem; margin-bottom:14px; }
+.about-text p{ color:#6d5b45; margin-bottom:16px; max-width:52ch; }
+.about-text .btn{ margin-top:8px; }
+
+/* the rotating photo show (slideshow of polaroids) */
+.photo-show{ flex:0 1 340px; margin:0 auto; width:100%; max-width:340px; }
+.slides{
+  position:relative; aspect-ratio:4/5;
+  background:#fff; border:9px solid #fff; border-radius:10px;
+  box-shadow:0 10px 24px rgba(62,44,30,.18);
+  transform:rotate(-1.5deg);
+  overflow:hidden;
+}
+.slide{ position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; opacity:0; transition:opacity .7s ease; }
+.slide.on{ opacity:1; }
+
+.s-btn{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:34px; height:34px; border-radius:50%;
+  border:2px solid var(--cup); background:var(--cream); color:var(--cup);
+  font-size:1.05rem; font-weight:700; cursor:pointer;
+  box-shadow:0 2px 6px rgba(62,44,30,.15);
+}
+.s-btn:hover{ background:#fff; }
+.s-prev{ left:-12px; }
+.s-next{ right:-12px; }
+
+.dots{ display:flex; justify-content:center; gap:8px; margin-top:14px; }
+.dot{
+  width:10px; height:10px; border-radius:50%;
+  border:none; background:var(--lid); cursor:pointer; padding:0;
+}
+.dot.on{ background:var(--cup); }
+
+/* a torn corner scrap strip, little instruction note */
+.insta-note{
+  margin-top:18px; text-align:center;
+  font-family:'Baloo 2',cursive; font-weight:600; font-size:.9rem; color:var(--faint);
+}
+
+/* ---------- the about story ---------- */
+.story{ max-width:620px; }
+.story p{ color:#6d5b45; margin-bottom:16px; }
+.story .lead{ font-family:'Baloo 2',cursive; font-weight:600; font-size:1.22rem; color:var(--ink); }
+.pull{
+  border-left:5px solid var(--mustard); background:var(--cream);
+  border-radius:0 12px 12px 0; padding:16px 18px; margin:22px 0;
+  font-family:'Baloo 2',cursive; font-weight:600; font-size:1.06rem; color:var(--ink);
+}
+
+/* ---------- single rooms (thoughts / books / voices) ---------- */
+.room-head p{ max-width:52ch; }
+.nox-line{ margin-top:10px; font-family:'Baloo 2',cursive; font-weight:600; font-size:.92rem; color:var(--faint); }
+
+/* one post's card */
+.post-card{
+  background:var(--cream); border:2px solid var(--card-border); border-radius:16px;
+  padding:26px 24px; margin-top:30px;
+  border-top:6px solid var(--room, var(--fur));
+  box-shadow:0 3px 10px rgba(62,44,30,.08);
+}
+.post-date{ font-family:'Baloo 2',cursive; font-weight:700; font-size:.8rem; letter-spacing:.3px;
+  text-transform:lowercase; color:var(--room, var(--fur)); }
+.post-card h3{ font-size:1.35rem; margin:6px 0 10px; }
+.post-body{ color:#6d5b45; margin:0; }
+
+/* the rabbit-hole strip under each post */
+.rabbit-hole{
+  margin-top:30px;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 27px, rgba(185,169,143,.28) 27px 28px);
+  border:2px solid var(--card-border); border-radius:14px;
+  padding:22px 20px 12px;
+}
+.rabbit-hole h3{ font-family:'Baloo 2',cursive; font-weight:600; font-size:.98rem; margin-bottom:12px; }
+.rh-link{
+  display:inline-block; margin:0 10px 10px 0; padding:7px 14px; border-radius:16px;
+  background:var(--paw); color:var(--ink); text-decoration:none;
+  font-weight:600; font-size:.9rem;
+}
+.rh-link:hover{ background:#fff; }
+.room-back{ margin-top:34px; text-align:left; }
+
+/* ---------- the "your stories" page ---------- */
+.form-box{
+  background:var(--cream); border:2px solid var(--card-border); border-radius:16px;
+  padding:22px; margin-bottom:8px;
+}
+.form-box label{
+  display:block; font-family:'Baloo 2',cursive; font-weight:600;
+  font-size:.92rem; margin-bottom:6px; color:var(--ink);
+}
+.form-box input[type=text], .form-box textarea{
+  width:100%; font-family:'Nunito',sans-serif; font-size:.95rem; color:var(--ink);
+  background:#fff; border:2px solid var(--card-border); border-radius:10px;
+  padding:9px 12px; margin-bottom:14px;
+}
+.form-box input[type=text]{ max-width:320px; }
+.form-box textarea{ resize:vertical; min-height:96px; }
+.form-box .btn{ border:none; cursor:pointer; }
+
+.status{ font-size:.85rem; color:var(--cup-d); margin-top:8px; min-height:1.2em; }
+
+.shelf-title{ font-family:'Baloo 2',cursive; font-weight:700; font-size:1.35rem; margin:8px 0 2px; }
+.shelf-title span{ font-size:.8rem; color:var(--faint); font-weight:600; }
+
+.shelf{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(215px,1fr));
+  gap:18px; margin-top:16px;
+}
+.note{
+  position:relative; background:var(--cream); border:2px solid var(--card-border);
+  border-radius:12px; padding:20px 16px 14px;
+  box-shadow:0 4px 10px rgba(62,44,30,.08);
+}
+/* the little tape strip on top of each card */
+.note::before{
+  content:""; position:absolute; top:-9px; left:50%;
+  transform:translateX(-50%) rotate(-3deg);
+  width:76px; height:18px; background:var(--mustard);
+  opacity:.75; border-radius:2px;
+}
+.note .who{ font-family:'Baloo 2',cursive; font-weight:700; font-size:.85rem; color:var(--fur-d); }
+.note .msg{ margin-top:6px; font-size:.92rem; color:#3a2c1e; word-break:break-word; }
+.note .when{ margin-top:10px; font-size:.72rem; color:var(--faint); }
+.note-remove{
+  display:block; margin-top:10px; padding:0; border:none; background:transparent;
+  font-family:'Nunito',sans-serif; font-size:.78rem; color:var(--faint);
+  cursor:pointer; text-decoration:underline;
+}
+.note-remove:hover{ color:var(--fur-d); }
+.shelf-empty{ color:var(--faint); font-style:italic; }
+
+/* ---------- footer ---------- */
+.site-foot{
+  margin-top:12px;
+  background:var(--cup-d); color:var(--cream); text-align:center;
+  padding:30px 24px;
+}
+.site-foot .tag{ font-family:'Baloo 2',cursive; font-weight:700; font-size:1.05rem; margin-bottom:6px; }
+.site-foot a{ color:#bde0dc; font-weight:600; text-decoration:none; }
+.site-foot a:hover{ text-decoration:underline; }
+.site-foot .foot-line{ font-size:.85rem; opacity:.75; margin-top:12px; }
+
+/* ---------- small screens ---------- */
+@media (max-width:640px){
+  .hero{ padding:48px 0 36px; }
+  .site-head{ justify-content:center; text-align:center; }
+}

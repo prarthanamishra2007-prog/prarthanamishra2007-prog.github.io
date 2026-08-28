@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>your stories · Prarthana's corner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+  <!-- quiet visitor count — invisible to readers, you see it at prarthana.goatcounter.com -->
+  <script data-goatcounter="https://prarthana.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body style="--accent:var(--fur-d)">
+  <!-- accent = darker fox fur, the "your stories" colour -->
+
+<header class="site-head">
+  <a class="wordmark" href="index.html">Prarthana's corner</a>
+  <nav class="site-nav">
+    <a href="index.html">home</a>
+    <a href="about.html">about</a>
+    <a href="thoughts.html">thoughts</a>
+    <a href="books.html">books</a>
+    <a href="voices.html">voices</a>
+    <a href="stories.html" class="active">stories</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="page">
+    <div class="wrap">
+      <div class="room-head">
+        <h2 class="taped" style="--tape:var(--fur-d)">your stories</h2>
+        <p class="section-blurb">a shared bookshelf — people's opinions, small thoughts, and recommendations, pinned for anyone to find.</p>
+        <p class="nox-line">— Nox says: the shelf is open, add a brick of your own.</p>
+      </div>
+
+      <!-- one: pin a note straight onto the shelf (instant) -->
+      <div class="form-box">
+        <label for="pinName">your name or alias (optional)</label>
+        <input type="text" id="pinName" maxlength="40" placeholder="leave blank if you like">
+
+        <label for="pinMsg">your note, thought, or recommendation</label>
+        <textarea id="pinMsg" maxlength="280" placeholder="a book I loved, a line that stayed, a small thought…"></textarea>
+
+        <!-- the form quietly posts to your Google notebook.
+             target=shelfTarget sends it into a hidden frame instead
+             of moving the page, so nothing jumps -->
+        <form id="pinForm" action="https://script.google.com/macros/s/AKfycbwiGVGcNqYDgmXg2njFVMOrpuYKmQBbqbvV-kzTvsfZh2kF560SqXaDUJyG9CM37mMW/exec" method="POST" target="shelfTarget">
+          <input type="hidden" name="id" id="pinIdHidden">
+          <input type="hidden" name="name" id="pinNameHidden">
+          <input type="hidden" name="message" id="pinMsgHidden">
+          <button type="submit" class="btn" style="--accent:var(--fur-d)">pin it to the shelf →</button>
+          <p class="status" id="pinStatus"></p>
+        </form>
+      </div>
+      <iframe name="shelfTarget" style="display:none" title="quiet helper frame"></iframe>
+
+      <!-- the shelf itself -->
+      <h3 class="shelf-title">on the shelf <span id="shelfCount"></span></h3>
+      <div class="shelf" id="shelf"></div>
+
+      <div style="height:34px"></div>
+
+      <!-- two: email me a longer story (goes straight to Prarthana, private) -->
+      <div class="form-box">
+        <h3 class="shelf-title">want to tell a longer story?</h3>
+        <p class="section-blurb" style="margin-top:4px;">If something here struck you, or you just want to write more than a note — send it to me and I'll read it (only me).</p>
+
+        <form id="storyForm" action="https://formspree.io/f/xljeepkw" method="POST">
+          <label for="storyMsg">your story or message</label>
+          <textarea id="storyMsg" name="message" maxlength="2000" placeholder="take your time…" required></textarea>
+          <button type="submit" class="btn">send it to Prarthana →</button>
+          <p class="status" id="storyStatus"></p>
+        </form>
+      </div>
+
+      <p class="room-back"><a class="btn" href="index.html#rooms">wander back →</a></p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <p class="tag">thanks for stopping by</p>
+  <a href="mailto:prarthana2678@gmail.com">say hi → prarthana2678@gmail.com</a>
+  <p class="foot-line">right now — drinking tea, thinking in circles, underlining books.</p>
+</footer>
+
+<script>
+  // ============================================================
+  //   SETUP — paste your two links here (see back-office/)
+  // ============================================================
+  const SHELF_URL = "https://script.google.com/macros/s/AKfycbwiGVGcNqYDgmXg2njFVMOrpuYKmQBbqbvV-kzTvsfZh2kF560SqXaDUJyG9CM37mMW/exec"; // your Google notebook
+
+  const shelf = document.getElementById('shelf');
+
+  function connected(){ return SHELF_URL.indexOf('PASTE') === -1; }
+
+  // -- the receipts: ids of notes pinned on THIS device.
+  //    Keys are stored on the visitor's own browser only, so only
+  //    their device can offer a "take it down" button.
+  function getReceipts(){ try{ return JSON.parse(localStorage.getItem('shelfReceipts') || '[]'); }catch(e){ return []; } }
+  function keepReceipt(id){ const r = getReceipts(); r.push(id); try{ localStorage.setItem('shelfReceipts', JSON.stringify(r)); }catch(e){} }
+
+  // -- build one little note card --
+  function noteCard(n){
+    const receipts = getReceipts();
+    const mine = receipts.indexOf(n.id) !== -1;   // did THIS device pin it?
+    const d = document.createElement('div');
+    d.className = 'note';
+    d.id = 'note-' + n.id;
+    d.innerHTML = '<div class="who">' + n.name + '</div>' +
+                  '<div class="msg">' + n.message + '</div>' +
+                  '<div class="when">pinned ' + n.time + '</div>' +
+                  (mine ? '<button class="note-remove" data-id="' + n.id + '">take it down ✕</button>' : '');
+    return d;
+  }
+
+  // -- fetch every note from the sheet --
+  async function loadShelf(){
+    document.getElementById('shelfCount').textContent = connected() ? '…' : '—';
+    if (!connected()){
+      shelf.innerHTML = '<p class="shelf-empty">the shelf is warming up — it wakes up once the two links are pasted in.</p>';
+      return;
+    }
+    try{
+      const r  = await fetch(SHELF_URL, { method:'GET' });
+      const ns = await r.json();
+      shelf.innerHTML = '';
+      ns.forEach(n => shelf.appendChild(noteCard(n)));
+      document.getElementById('shelfCount').textContent = ns.length + ' note' + (ns.length === 1 ? '' : 's');
+      document.getElementById('pinStatus').textContent = '';
+    }catch(err){
+      shelf.innerHTML = '<p class="shelf-empty">couldn\'t reach the shelf right now — come back in a bit.</p>';
+    }
+  }
+
+  // -- pin a new note --
+  const pinForm   = document.getElementById('pinForm');
+  const hiddenId  = document.getElementById('pinIdHidden');
+  const hiddenName = document.getElementById('pinNameHidden');
+  const hiddenMsg  = document.getElementById('pinMsgHidden');
+  const iframe = document.querySelector('iframe[name="shelfTarget"]');
+
+  pinForm.addEventListener('submit', (e) => {
+    const msg = document.getElementById('pinMsg').value.trim();
+    if (!msg){ document.getElementById('pinStatus').textContent = 'the note itself is the important part ✎'; e.preventDefault(); return; }
+    if (!connected()){
+      document.getElementById('pinStatus').textContent = 'shelf not connected yet — see the setup note at the top of the script.';
+      e.preventDefault(); return;
+    }
+    // a random id, kept as this device's receipt
+    const id = 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    hiddenId.value = id;
+    hiddenName.value = document.getElementById('pinName').value.trim();
+    hiddenMsg.value  = msg;
+    keepReceipt(id);
+    document.getElementById('pinStatus').textContent = 'pinning…';
+    // when the hidden frame finishes, refresh the shelf
+    iframe.onload = () => {
+      document.getElementById('pinStatus').textContent = 'pinned! ✦ (you can take it down later)';
+      document.getElementById('pinMsg').value = '';
+      loadShelf();
+    };
+    // (let the browser send the form itself — no more blocked requests)
+  });
+
+  // -- take a note down (only ones this device pinned) --
+  function takeDown(id){
+    if (!confirm('take this note down? it\'s only yours to remove.')) return;
+    const f = document.createElement('form');
+    f.method = 'POST'; f.action = SHELF_URL; f.target = 'shelfTarget';
+    const a = document.createElement('input'); a.type = 'hidden'; a.name = 'action'; a.value = 'delete'; f.appendChild(a);
+    const i = document.createElement('input'); i.type = 'hidden'; i.name = 'id'; i.value = id; f.appendChild(i);
+    document.body.appendChild(f);
+    iframe.onload = () => {
+      document.getElementById('pinStatus').textContent = 'taken down ✦';
+      loadShelf();
+    };
+    f.submit();
+  }
+
+  // a click on any "take it down" button calls takeDown with its id
+  shelf.addEventListener('click', (e) => {
+    if (e.target.classList && e.target.classList.contains('note-remove')){
+      takeDown(e.target.getAttribute('data-id'));
+    }
+  });
+
+  // -- the email box: sends in the background, no page-jump --
+  document.getElementById('storyForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = document.getElementById('storyStatus');
+    const msg = document.getElementById('storyMsg').value.trim();
+    if (!msg){ status.textContent = 'a story needs its words first ✎'; return; }
+    status.textContent = 'sending…';
+    try{
+      const r = await fetch(document.getElementById('storyForm').action, {
+        method: 'POST',
+        body:   new FormData(document.getElementById('storyForm')),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (r.ok){
+        document.getElementById('storyMsg').value = '';
+        status.textContent = 'sent — thank you! she\'ll read it ✦';
+      } else {
+        status.textContent = 'hmm, it didn\'t go through — try again?';
+      }
+    }catch(err){
+      status.textContent = 'hmm, it didn\'t go through — try again?';
+    }
+  });
+
+  loadShelf();
+</script>
+
+</body>
+</html>
