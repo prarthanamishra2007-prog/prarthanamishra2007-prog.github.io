@@ -1,157 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>welcome · Prarthana's corner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Nunito',sans-serif; }
 
-    <title>Prarthana | Thoughts & Things I Wonder About</title>
+  :root{
+    --paper:#F4ECDD; --fur:#CE6E3C; --fur-d:#B25628; --cream:#F8EFE1;
+    --paw:#F3E4CE; --ink:#3E2C1E;
+    --cup:#3E8E86; --cup-d:#2F6E68; --lid:#EAD9BE;
+    --cheek:#E88E77; --mustard:#D8A33F; --steam:#B9A98F;
+  }
 
-    <style>
-        body {
-            margin: 0;
-            font-family: Georgia, serif;
-            background: #faf9f6;
-            color: #292929;
-        }
+  .scene{ position:relative; width:100%; height:560px; overflow:hidden;
+    background:var(--paper); border-radius:16px;
+    display:flex; align-items:center; justify-content:center; }
 
-        header {
-            padding: 25px 8%;
-            border-bottom: 1px solid #ddd;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+  .controls{ position:absolute; top:16px; right:18px; z-index:9; display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+  .skip{ font-family:'Nunito',sans-serif; font-size:14px; color:var(--ink);
+    background:rgba(255,255,255,.55); border:1.5px solid #d8c8ad; padding:6px 14px; border-radius:20px; cursor:pointer; }
+  .skip:hover{ background:#fff; }
+  .remember{ display:flex; align-items:center; gap:7px; font-size:12.5px; color:#7a6a54;
+    background:rgba(255,255,255,.45); padding:5px 11px; border-radius:16px; cursor:pointer; user-select:none; }
+  .remember input{ accent-color:var(--fur); width:15px; height:15px; cursor:pointer; }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-        }
+  .intro{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    transition:opacity .7s ease, transform .7s ease; }
 
-        nav a {
-            margin-left: 25px;
-            text-decoration: none;
-            color: #292929;
-        }
+  .walker{ transform:translateX(-140%); }
+  .play .walker{ animation:walkIn 2s cubic-bezier(.22,.61,.36,1) forwards; }
+  .play .bob{ animation:bob .5s ease-in-out 4; }
+  .dance{ transform-origin:50% 100%; }
+  .play .dance{ animation:dance 1.6s ease 2.1s forwards; }
 
-        nav a:hover {
-            text-decoration: underline;
-        }
+  .mascot{ width:250px; height:auto; display:block; }
 
-        .hero {
-            max-width: 850px;
-            margin: 120px auto;
-            padding: 0 25px;
-        }
+  .legL,.legR{ transform-box:fill-box; transform-origin:50% 8%; }
+  .play .legL{ animation:step .5s ease-in-out 4; }
+  .play .legR{ animation:step .5s ease-in-out 4; animation-delay:-.25s; }
 
-        .hero h1 {
-            font-size: 56px;
-            line-height: 1.1;
-            margin-bottom: 25px;
-        }
+  .speech{ position:absolute; left:50%; bottom:100%; transform:translateX(-50%); margin-bottom:16px;
+    width:280px; text-align:center; font-family:'Baloo 2',cursive; font-weight:600; font-size:17px; line-height:1.35;
+    color:var(--ink); background:var(--cream); border:2px solid #d8c8ad; padding:14px 18px; border-radius:18px; opacity:0; }
+  .speech::after{ content:""; position:absolute; left:50%; top:100%; transform:translateX(-50%);
+    border:9px solid transparent; border-top-color:var(--cream); }
+  .play .speech{ animation:pop .5s ease 3.9s forwards; }
 
-        .hero p {
-            font-size: 21px;
-            line-height: 1.7;
-            max-width: 650px;
-        }
+  .cup{ transform-box:fill-box; transform-origin:50% 100%; opacity:0; }
+  .play .cup{ animation:coffeePop .55s cubic-bezier(.34,1.56,.64,1) 3.5s forwards; }
+  .spark{ transform-box:fill-box; transform-origin:center; opacity:0; }
+  .play .spark{ animation:sparkle .6s ease 3.55s forwards; }
+  .steam{ animation:steam 2.2s ease-in-out infinite; }
+  .tail{ transform-box:fill-box; transform-origin:85% 20%; animation:sway 3s ease-in-out infinite; }
 
-        .section {
-            max-width: 850px;
-            margin: 80px auto;
-            padding: 0 25px;
-        }
+  .home{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:12px; opacity:0; transform:translateX(34px);
+    transition:opacity .7s ease .15s, transform .7s ease .15s; pointer-events:none; padding:0 24px; }
+  .home h1{ font-family:'Baloo 2',cursive; font-weight:700; font-size:clamp(2rem,6vw,3rem); color:var(--ink); }
+  .home p{ color:#7a6a54; max-width:34ch; }
+  .home .note{ font-size:12.5px; color:#a08f76; margin-top:4px; }
+  .replay{ margin-top:14px; font-family:'Nunito',sans-serif; font-weight:600; font-size:14px; color:var(--ink);
+    background:var(--mustard); border:none; padding:9px 20px; border-radius:22px; cursor:pointer; }
+  .replay:hover{ filter:brightness(1.05); }
 
-        .section h2 {
-            font-size: 32px;
-        }
+  .revealed .intro{ opacity:0; transform:translateX(-40px); pointer-events:none; }
+  .revealed .home{ opacity:1; transform:none; pointer-events:auto; }
 
-        footer {
-            text-align: center;
-            padding: 50px;
-            border-top: 1px solid #ddd;
-            margin-top: 100px;
-        }
-    </style>
+  @keyframes walkIn{ from{transform:translateX(-140%);} to{transform:translateX(0);} }
+  @keyframes bob{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
+  @keyframes step{ 0%,100%{transform:rotate(0);} 25%{transform:rotate(24deg);} 75%{transform:rotate(-24deg);} }
+  @keyframes dance{
+    0%{transform:rotate(0) translateY(0);}
+    15%{transform:rotate(-13deg) translateY(-6px);}
+    30%{transform:rotate(0);}
+    45%{transform:rotate(13deg) translateY(-6px);}
+    60%{transform:rotate(0);}
+    75%{transform:rotate(-10deg) translateY(-4px);}
+    90%{transform:rotate(9deg);}
+    100%{transform:rotate(0) translateY(0);} }
+  @keyframes coffeePop{ 0%{opacity:0; transform:scale(0) translateY(14px);} 100%{opacity:1; transform:scale(1) translateY(0);} }
+  @keyframes sparkle{ 0%{opacity:0; transform:scale(0);} 60%{opacity:1; transform:scale(1.25);} 100%{opacity:1; transform:scale(1);} }
+  @keyframes pop{ from{opacity:0; transform:translateX(-50%) scale(.7);} to{opacity:1; transform:translateX(-50%) scale(1);} }
+  @keyframes steam{ 0%,100%{opacity:.25; transform:translateY(0);} 50%{opacity:.7; transform:translateY(-6px);} }
+  @keyframes sway{ 0%,100%{transform:rotate(-5deg);} 50%{transform:rotate(6deg);} }
+
+  @media (prefers-reduced-motion:reduce){
+    .walker{ transform:none; } .speech,.cup,.spark{ opacity:1; }
+    .play .walker,.play .bob,.play .dance,.play .legL,.play .legR,.play .cup,.play .spark,.steam,.tail{ animation:none; }
+  }
+</style>
 </head>
-
 <body>
 
-    <header>
+<div class="scene" id="scene">
+  <div class="controls">
+    <button class="skip" id="skip">skip intro →</button>
+    <label class="remember"><input type="checkbox" id="remember"> skip this from now on</label>
+  </div>
 
-        <div class="logo">
-            Prarthana
+  <div class="intro" id="intro">
+    <div class="walker">
+      <div class="bob">
+        <div class="dance">
+          <div style="position:relative;">
+            <div class="speech">here's your coffee — let's explore this corner of the world together!</div>
+
+            <svg class="mascot" viewBox="0 0 250 278" xmlns="http://www.w3.org/2000/svg" aria-label="a cheerful fox handing over a coffee">
+              <g class="tail">
+                <ellipse cx="70" cy="214" rx="15" ry="14" fill="var(--fur)"/>
+                <ellipse cx="62" cy="200" rx="15" ry="14" fill="var(--cream)"/>
+                <ellipse cx="64" cy="185" rx="16" ry="14" fill="var(--fur)"/>
+                <ellipse cx="78" cy="176" rx="16" ry="14" fill="var(--cream)"/>
+                <ellipse cx="94" cy="172" rx="16" ry="15" fill="var(--fur)"/>
+              </g>
+
+              <g class="legL">
+                <rect x="99" y="198" width="24" height="48" rx="12" fill="var(--fur)"/>
+                <ellipse cx="111" cy="248" rx="14" ry="8" fill="var(--paw)"/>
+              </g>
+              <g class="legR">
+                <rect x="127" y="198" width="24" height="48" rx="12" fill="var(--fur)"/>
+                <ellipse cx="139" cy="248" rx="14" ry="8" fill="var(--paw)"/>
+              </g>
+
+              <ellipse cx="125" cy="172" rx="46" ry="48" fill="var(--fur)"/>
+              <circle  cx="125" cy="92"  r="50" fill="var(--fur)"/>
+              <path d="M125 128 C150 128 158 150 158 176 C158 204 145 218 125 218 C105 218 92 204 92 176 C92 150 100 128 125 128 Z" fill="var(--cream)"/>
+
+              <path d="M92 150 C74 142 66 126 72 116" stroke="var(--fur)" stroke-width="16" fill="none" stroke-linecap="round"/>
+              <path d="M158 150 C176 142 184 126 178 116" stroke="var(--fur)" stroke-width="16" fill="none" stroke-linecap="round"/>
+              <circle cx="72" cy="114" r="9" fill="var(--paw)"/>
+              <circle cx="178" cy="114" r="9" fill="var(--paw)"/>
+
+              <g class="cup">
+                <path class="steam" d="M118 150 q6 -6 0 -12" stroke="var(--steam)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <path class="steam" d="M130 150 q6 -6 0 -12" stroke="var(--steam)" stroke-width="2.5" fill="none" stroke-linecap="round" style="animation-delay:.7s"/>
+                <path d="M112 158 L140 158 L136 196 L116 196 Z" fill="var(--cup)"/>
+                <path d="M126 158 L140 158 L136 196 L129 196 Z" fill="var(--cup-d)"/>
+                <rect x="110" y="153" width="32" height="8" rx="3" fill="var(--lid)"/>
+                <rect x="114" y="174" width="24" height="9" rx="2" fill="var(--lid)" opacity=".9"/>
+              </g>
+              <path class="spark" d="M96 150 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3 Z" fill="var(--mustard)"/>
+              <path class="spark" d="M156 156 l2.5 6 l6 2.5 l-6 2.5 l-2.5 6 l-2.5 -6 l-6 -2.5 l6 -2.5 Z" fill="var(--cup)" style="animation-delay:.15s"/>
+
+              <g>
+                <polygon points="86,58 100,24 122,56" fill="var(--fur)"/>
+                <polygon points="128,56 150,24 164,60" fill="var(--fur)"/>
+                <polygon points="94,52 100,34 112,52" fill="var(--fur-d)"/>
+                <polygon points="134,52 146,34 152,54" fill="var(--fur-d)"/>
+                <polygon points="76,96 94,88 92,108" fill="var(--cream)"/>
+                <polygon points="174,96 156,88 158,108" fill="var(--cream)"/>
+                <ellipse cx="125" cy="106" rx="34" ry="27" fill="var(--cream)"/>
+                <circle cx="100" cy="106" r="8" fill="var(--cheek)" opacity=".6"/>
+                <circle cx="150" cy="106" r="8" fill="var(--cheek)" opacity=".6"/>
+                <path d="M96 92 q9 -9 18 0" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <ellipse cx="140" cy="90" rx="6.5" ry="8.5" fill="var(--ink)"/>
+                <circle cx="142" cy="86" r="2.3" fill="#fff"/>
+                <path d="M125 104 l6 6 l-6 5 l-6 -5 Z" fill="var(--ink)"/>
+                <path d="M113 117 q12 18 24 0 q-12 7 -24 0 Z" fill="var(--ink)"/>
+                <path d="M119 123 q6 7 12 0 Z" fill="var(--cheek)"/>
+              </g>
+            </svg>
+
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <nav>
-            <a href="#">Home</a>
-            <a href="#thoughts">Thoughts</a>
-            <a href="#about">About</a>
-            <a href="#contact">Contact</a>
-        </nav>
+  <div class="home" id="home">
+    <h1>Prarthana's corner</h1>
+    <p>thoughts, books, and other people's stories — pull up a chair and wander around.</p>
+    <p class="note">(your real homepage — sliding photo + sections — builds next)</p>
+    <button class="replay" id="replay">replay the welcome</button>
+  </div>
+</div>
 
-    </header>
+<script>
+  const scene    = document.getElementById('scene');
+  const intro    = document.getElementById('intro');
+  const remember = document.getElementById('remember');
+  let timer;
 
+  function savePref(v){ try{ v ? localStorage.setItem('skipIntro','1') : localStorage.removeItem('skipIntro'); }catch(e){} }
+  function wantsSkip(){ try{ return localStorage.getItem('skipIntro') === '1'; }catch(e){ return false; } }
 
-    <section class="hero">
+  function play(){
+    scene.classList.remove('revealed');
+    intro.classList.remove('play');
+    void intro.offsetWidth;
+    intro.classList.add('play');
+    clearTimeout(timer);
+    timer = setTimeout(reveal, 7500);
+  }
+  function reveal(){ clearTimeout(timer); scene.classList.add('revealed'); }
 
-        <h1>
-            A little corner of the internet where I think out loud.
-        </h1>
+  remember.addEventListener('change', () => savePref(remember.checked));
+  document.getElementById('skip').addEventListener('click', () => { if(remember.checked) savePref(true); reveal(); });
+  document.getElementById('replay').addEventListener('click', () => { savePref(false); remember.checked = false; play(); });
 
-        <p>
-            I'm Prarthana. I write about the things I read,
-            the questions that stay in my head, people,
-            life, and the little observations that make me stop and think.
-        </p>
-
-    </section>
-
-
-    <section class="section" id="thoughts">
-
-        <h2>Latest thoughts</h2>
-
-        <p>
-            Nothing here yet — but this is where my writing will live.
-        </p>
-
-    </section>
-
-
-    <section class="section" id="about">
-
-        <h2>About</h2>
-
-        <p>
-            Welcome to my little corner of the internet.
-            This is a place for ideas, reflections, curiosity,
-            and things worth thinking about.
-        </p>
-
-    </section>
-
-
-    <section class="section" id="contact">
-
-        <h2>Let's talk</h2>
-
-        <p>
-            Have something to say about something I wrote?
-            I'd love to hear from you.
-        </p>
-
-        <p>
-            <a href="mailto:prarthana2678@gmail.com">Email me</a>
-        </p>
-
-    </section>
-
-
-    <footer>
-        © 2026 Prarthana
-    </footer>
+  if (wantsSkip()) { remember.checked = true; scene.classList.add('revealed'); }
+  else { play(); }
+</script>
 
 </body>
-
 </html>
