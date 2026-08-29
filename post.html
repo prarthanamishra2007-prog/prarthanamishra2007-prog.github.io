@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>reading · Prarthana's corner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@400;600&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+  <!-- quiet visitor count — invisible to readers, you see it at prarthana.goatcounter.com -->
+  <script data-goatcounter="https://prarthana.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body style="--accent:var(--fur);--room:var(--fur)">
+
+<header class="site-head">
+  <a class="wordmark" href="index.html">Prarthana's corner</a>
+  <nav class="site-nav">
+    <a href="index.html">home</a>
+    <a href="about.html">about</a>
+    <a href="thoughts.html">thoughts</a>
+    <a href="books.html">books</a>
+    <a href="voices.html">voices</a>
+    <a href="stories.html">stories</a>
+  </nav>
+</header>
+
+<main>
+  <section class="page">
+    <div class="wrap">
+      <div id="thePost"></div>
+
+      <section class="rabbit-hole">
+        <h3>you might also like →</h3>
+        <a class="rh-link" href="thoughts.html">into thoughts →</a>
+        <a class="rh-link" href="books.html">into books →</a>
+        <a class="rh-link" href="voices.html">into voices →</a>
+        <a class="rh-link" href="about.html">the person behind it →</a>
+      </section>
+
+      <p class="room-back"><a class="btn" href="index.html#rooms">wander back home →</a></p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <p class="tag">thanks for stopping by</p>
+  <a href="mailto:prarthana2678@gmail.com">say hi → prarthana2678@gmail.com</a>
+  <p class="foot-line">right now — drinking tea, thinking in circles, underlining books.</p>
+</footer>
+
+<script src="posts.js"></script>
+<script>
+  // each room has its own accent colour — a post takes the colour of its room
+  const roomColor = {
+    thoughts: { accent: 'var(--fur)', room: 'var(--fur)'  },
+    books:    { accent: 'var(--cup)', room: 'var(--cup)'  },
+    voices:   { accent: 'var(--cheek)', room: 'var(--cheek)' }
+  };
+
+  const q     = new URLSearchParams(location.search).get('id') || '';
+  const slots = document.getElementById('thePost');
+
+  (async () => {
+    try {
+      const posts = await fetchPosts();
+      const p = posts.find(post => post.id === q);
+
+      if (!p) {
+        slots.innerHTML =
+          '<div class="missing"><p class="big">this post wandered off 🦊</p>' +
+          '<p>it might have been taken down, or the link is sleepy. try the rooms below.</p></div>';
+        return;
+      }
+
+      const room = roomColor[p.room] || roomColor.thoughts;
+      document.body.style.setProperty('--accent', room.accent);
+      document.body.style.setProperty('--room',   room.room);
+
+      // mark the right nav link as active
+      document.querySelectorAll('.site-nav a').forEach(a => {
+        a.classList.remove('active');
+        if (a.getAttribute('href') === p.room + '.html') a.classList.add('active');
+      });
+
+      document.title = p.title + ' · Prarthana\'s corner';
+
+      const paragraphs = paraBlocks(p.body)
+        .map(b => '<p>' + esc(b) + '</p>')
+        .join('');
+
+      const pic = p.image
+        ? '<figure class="post-pic"><img src="' + esc(p.image) +
+          '" alt="' + esc(p.caption || p.title) + '">' +
+          (p.caption ? '<figcaption class="post-cap">' + esc(p.caption) + '</figcaption>' : '') +
+          '</figure>'
+        : '';
+
+      slots.innerHTML =
+        '<article class="post-page flavour-' + esc(p.style || 'standard') + '">' +
+          '<span class="post-kicker">' + esc(p.room) + '</span>' +
+          '<h1 class="post-title">' + esc(p.title) + '</h1>' +
+          '<p class="post-date2">' + esc(p.date || '') + '</p>' +
+          pic +
+          (p.desc ? '<p class="post-lead">' + esc(p.desc) + '</p>' : '') +
+          '<div class="post-body2">' + paragraphs + '</div>' +
+        '</article>';
+    } catch (err) {
+      slots.innerHTML =
+        '<div class="missing"><p class="big">the notebook is napping 🦊</p>' +
+        '<p>couldn\'t reach your posts just now — try again in a moment.</p></div>';
+    }
+  })();
+</script>
+
+</body>
+</html>

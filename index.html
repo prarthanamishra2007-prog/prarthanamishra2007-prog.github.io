@@ -270,17 +270,17 @@ body.revealed .welcome{ transform:translateY(-101%); }
     <div class="wrap">
       <h2 class="taped" style="--tape:var(--cup)">fresh from the corner</h2>
       <div class="cards">
-        <a class="card" href="thoughts.html" style="--room:var(--fur)">
+        <a class="card" href="thoughts.html" style="--room:var(--fur)" data-room="thoughts">
           <span class="room">thoughts</span>
           <span class="post">your newest thought will live here</span>
           <span class="soon">first post coming soon</span>
         </a>
-        <a class="card" href="books.html" style="--room:var(--cup)">
+        <a class="card" href="books.html" style="--room:var(--cup)" data-room="books">
           <span class="room">books</span>
           <span class="post">your latest read will live here</span>
           <span class="soon">first book note coming soon</span>
         </a>
-        <a class="card" href="voices.html" style="--room:var(--cheek)">
+        <a class="card" href="voices.html" style="--room:var(--cheek)" data-room="voices">
           <span class="room">voices</span>
           <span class="post">someone's story will live here</span>
           <span class="soon">first voice coming soon</span>
@@ -374,6 +374,32 @@ body.revealed .welcome{ transform:translateY(-101%); }
 
   if (wantsSkip()) { remember.checked = true; document.body.classList.add('revealed'); }
   else { play(); }
+</script>
+
+<script src="posts.js"></script>
+<script>
+  // keep the "fresh from the corner" cards showing your newest real post
+  function fillCards(posts) {
+    if (!posts) return;
+    const latest = {};
+    posts.forEach(p => { if (!latest[p.room]) latest[p.room] = p; });
+
+    ['thoughts', 'books', 'voices'].forEach(room => {
+      const card = document.querySelector('.card[data-room="' + room + '"]');
+      const p    = latest[room];
+      if (!card) return;
+      if (!p) return;                  // no post yet → keep the cosy placeholder
+      card.href = postHref(p.id);
+      card.querySelector('.post').textContent = p.title;
+      card.querySelector('.soon').textContent = p.date + ' · read it →';
+    });
+  }
+
+  (async () => {
+    try {
+      fillCards(await fetchPosts(null, fillCards));   // paints instantly from memory
+    } catch (err) { /* notebook napping — keep the placeholders */ }
+  })();
 </script>
 
 </body>

@@ -36,12 +36,12 @@
         <p class="nox-line">— Nox says: the kettle's on, think out loud.</p>
       </div>
 
-      <!-- your first thought-post lives here -->
-      <article class="post-card">
-        <div class="post-date">first entry · soon</div>
-        <h3>your first thought will brew here</h3>
-        <p class="post-body">A sentence, a question, a half-idea — it all starts with one cup of coffee and one honest line. This is the seat where your first real post will sit.</p>
-      </article>
+      <!-- your thoughts, newest first — a numbered list, click to read the whole post -->
+      <ol class="post-list" id="postList">
+        <li class="post-empty">gathering your thoughts…
+          <span class="post-empty-hint">(if it stays quiet, check that the notebook script is deployed)</span>
+        </li>
+      </ol>
 
       <!-- the rabbit-hole strip: places to wander next -->
       <section class="rabbit-hole">
@@ -62,6 +62,35 @@
   <a href="mailto:prarthana2678@gmail.com">say hi → prarthana2678@gmail.com</a>
   <p class="foot-line">right now — drinking tea, thinking in circles, underlining books.</p>
 </footer>
+
+<script src="posts.js"></script>
+<script>
+  const list = document.getElementById('postList');
+
+  function render(posts) {
+    if (!posts || !posts.length) {
+      list.innerHTML = '<li class="post-empty">no thoughts in the kettle yet — the first one will brew here.'
+        + '<span class="post-empty-hint">(written by the owner, in her writing nook)</span></li>';
+      return;
+    }
+    list.innerHTML = posts.map(p =>
+      '<li><a class="post-link" href="' + postHref(p.id) + '">' +
+        '<span class="p-top"><span class="p-title">' + esc(p.title) + '</span>' +
+        '<span class="p-date">' + esc(p.date) + '</span></span>' +
+        (p.desc ? '<span class="p-desc">' + esc(p.desc) + '</span>' : '') +
+        '<span class="p-more">read it →</span>' +
+      '</a></li>'
+    ).join('');
+  }
+
+  (async () => {
+    try {
+      render(await fetchPosts('thoughts', render));
+    } catch (err) {
+      list.innerHTML = '<li class="post-empty">the notebook is napping — try again in a moment 🦊</li>';
+    }
+  })();
+</script>
 
 </body>
 </html>

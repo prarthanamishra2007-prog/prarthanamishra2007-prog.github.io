@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>the writing nook · Prarthana's corner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Nunito:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+  <!-- quiet visitor count — invisible to readers, you see it at prarthana.goatcounter.com -->
+  <script data-goatcounter="https://prarthana.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body style="--accent:var(--mustard);--room:var(--mustard)">
+
+<header class="site-head">
+  <a class="wordmark" href="index.html">Prarthana's corner</a>
+  <nav class="site-nav">
+    <a href="index.html">home</a>
+    <a href="about.html">about</a>
+    <a href="thoughts.html">thoughts</a>
+    <a href="books.html">books</a>
+    <a href="voices.html">voices</a>
+    <a href="stories.html">stories</a>
+  </nav>
+</header>
+
+<main>
+  <section class="page">
+    <div class="wrap">
+      <div class="room-head">
+        <h2 class="taped" style="--tape:var(--mustard)">the writing nook</h2>
+        <p class="nook-note">This is <em>your</em> quiet little desk — visitors never see it (it's not linked anywhere). Write a post, choose a room, add a flavour and maybe a picture, then hit <strong>publish</strong>. Your words go straight into your Google notebook, and the room pages pick them up on their own. For your eyes and yours alone.</p>
+      </div>
+
+      <div class="nook-grid">
+
+        <!-- ---- the writing desk ---- -->
+        <div class="form-box">
+          <label>which room? (each saves under that room's colour)</label>
+          <div class="pick">
+            <label><input type="radio" name="room" value="thoughts" checked><span>thoughts</span></label>
+            <label><input type="radio" name="room" value="books"><span>books</span></label>
+            <label><input type="radio" name="room" value="voices"><span>voices</span></label>
+          </div>
+
+          <label>flavour (how the post is styled)</label>
+          <div class="pick">
+            <label><input type="radio" name="style" value="standard" checked><span>cosy</span></label>
+            <label><input type="radio" name="style" value="letter"><span>letter</span></label>
+            <label><input type="radio" name="style" value="poem"><span>poem</span></label>
+            <label><input type="radio" name="style" value="festival"><span>festival</span></label>
+          </div>
+          <span class="hint">cosy = the usual look · letter = handwriting · poem = centred, airy · festival = big taped title.</span>
+
+          <label>topic (the title readers see)</label>
+          <input type="text" id="titleBox" maxlength="120" placeholder="a title worth a coin flip">
+
+          <label>short description (the line on the numbered list)</label>
+          <textarea id="descBox" maxlength="280" placeholder="one honest sentence — what is this one about?"></textarea>
+
+          <label>the full writing</label>
+          <textarea id="bodyBox" class="nook-big" placeholder="write as long as you like… leave a blank line between paragraphs."></textarea>
+
+          <label>picture (optional)</label>
+          <input type="text" id="imgBox" class="nook-link" list="photoList" placeholder="photos/myphoto.jpg  — or paste any image link">
+          <datalist id="photoList">
+            <option value="photos/me.jpg">
+            <option value="photos/about-1.jpg">
+            <option value="photos/about-2.jpg">
+          </datalist>
+          <input type="text" id="capBox" placeholder="caption under the picture (optional)">
+
+          <button class="btn" onclick="publishPost()">publish to the room ✦</button>
+          <p class="status" id="nookStatus"></p>
+        </div>
+
+        <!-- ---- the shelf of what's already written ---- -->
+        <div>
+          <h3 class="manage-title">your published posts</h3>
+          <div id="manageList"><p class="status">gathering your words…</p></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <p class="tag">thanks for stopping by</p>
+  <a href="mailto:prarthana2678@gmail.com">say hi → prarthana2678@gmail.com</a>
+  <p class="foot-line">right now — drinking tea, thinking in circles, underlining books.</p>
+</footer>
+
+<!-- hidden form: sends to the notebook without reloading the page -->
+<iframe name="nookTarget" style="display:none"></iframe>
+<form id="nookForm" method="POST" target="nookTarget">
+  <input type="hidden" name="action" value="addpost">
+  <input type="hidden" name="key" value="prarthana-pours-the-tea">
+  <input type="hidden" name="id" value="">
+  <input type="hidden" name="room" value="thoughts">
+  <input type="hidden" name="style" value="standard">
+  <input type="hidden" name="title" value="">
+  <input type="hidden" name="desc" value="">
+  <input type="hidden" name="body" value="">
+  <input type="hidden" name="image" value="">
+  <input type="hidden" name="caption" value="">
+</form>
+
+<script src="posts.js"></script>
+<script>
+  const nookForm   = document.getElementById('nookForm');
+  const nookTarget = document.querySelector('iframe[name=nookTarget]');
+  const statusEl   = document.getElementById('nookStatus');
+  const manageEl   = document.getElementById('manageList');
+
+  // the form's address is set once here, so unpublish works even
+  // before the first publish of the day (this was the bug!)
+  nookForm.action = POSTS_URL;
+
+  let pendingDelete = null;   // the id we're trying to take down
+
+  nookTarget.addEventListener('load', () => {
+    if (pendingDelete) {
+      // a delete just finished — confirm it actually disappeared
+      const gone = pendingDelete;
+      pendingDelete = null;
+      loadManage(gone);
+    } else {
+      statusEl.textContent = 'saved to the notebook ✦';
+      loadManage();
+    }
+  });
+
+  function currentRoom() {
+    const r = document.querySelector('input[name=room]:checked');
+    return r ? r.value : 'thoughts';
+  }
+
+  function publishPost() {
+    const title = document.getElementById('titleBox').value.trim();
+    const body  = document.getElementById('bodyBox').value.trim();
+    if (!title) { statusEl.textContent = 'give it a topic first 🦊'; return; }
+    if (!body)  { statusEl.textContent = 'the writing is empty — write a little first.'; return; }
+
+    nookForm.action    = POSTS_URL;
+    nookForm.querySelector('[name=action]').value  = 'addpost';
+    nookForm.querySelector('[name=id]').value      = 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    nookForm.querySelector('[name=room]').value    = currentRoom();
+    nookForm.querySelector('[name=style]').value   = document.querySelector('input[name=style]:checked').value;
+    nookForm.querySelector('[name=title]').value   = title;
+    nookForm.querySelector('[name=desc]').value    = document.getElementById('descBox').value.trim();
+    nookForm.querySelector('[name=body]').value    = body;
+    nookForm.querySelector('[name=image]').value   = document.getElementById('imgBox').value.trim();
+    nookForm.querySelector('[name=caption]').value = document.getElementById('capBox').value.trim();
+
+    statusEl.textContent = 'publishing…';
+    nookForm.submit();
+    forgetPostsCache();
+    document.getElementById('titleBox').value = '';
+    document.getElementById('descBox').value  = '';
+    document.getElementById('bodyBox').value  = '';
+    document.getElementById('imgBox').value   = '';
+    document.getElementById('capBox').value   = '';
+  }
+
+  function unpublishPost(id) {
+    pendingDelete = id;
+    nookForm.querySelector('[name=action]').value = 'deletepost';
+    nookForm.querySelector('[name=id]').value     = id;
+    statusEl.textContent = 'taking it down…';
+    nookForm.submit();
+    forgetPostsCache();
+  }
+
+  async function loadManage(awaitingGone) {
+    try {
+      renderManage(await fetchPosts(null, renderManage), awaitingGone);
+    } catch (err) {
+      manageEl.innerHTML = '<p class="status">couldn\'t reach the notebook — is the script deployed?</p>';
+    }
+  }
+
+  function renderManage(posts, awaitingGone) {
+    if (awaitingGone) {
+      const stillThere = posts.some(p => p.id === awaitingGone);
+      statusEl.textContent = stillThere
+        ? 'still there — the notebook said no. (key + script ok? try once more)'
+        : 'taken down ✦';
+    }
+    if (!posts || !posts.length) {
+      manageEl.innerHTML = '<p class="status">nothing published yet — your first post is waiting.</p>';
+      return;
+    }
+    manageEl.innerHTML = posts.map(p =>
+      '<div class="manage-item">' +
+        '<div><div class="mi-title">' + esc(p.title) + '</div>' +
+        '<div class="mi-meta">' + esc(p.room) + ' · ' + esc(p.date) + ' · ' + esc(p.style) + '</div></div>' +
+        '<button class="unpub" onclick="unpublishPost(\'' + esc(p.id) + '\')">unpublish ✕</button>' +
+      '</div>'
+    ).join('');
+  }
+
+  loadManage();
+</script>
+
+</body>
+</html>

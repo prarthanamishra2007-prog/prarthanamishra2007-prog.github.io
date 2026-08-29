@@ -340,3 +340,105 @@ body.revealed .photo{ transform:none; opacity:1; }
   .hero{ padding:48px 0 36px; }
   .site-head{ justify-content:center; text-align:center; }
 }
+
+/* ============================================================
+   YOUR written posts : the numbered list (room pages)
+   ============================================================ */
+.post-list{ list-style:none; counter-reset:postnum; display:grid; gap:14px; margin-top:26px; padding:0; }
+.post-list li{ counter-increment:postnum; }
+
+.post-link{
+  position:relative; display:block;
+  background:var(--cream); border:2px solid var(--card-border); border-radius:16px;
+  padding:20px 20px 18px 62px; text-decoration:none; color:var(--ink);
+  box-shadow:0 3px 8px rgba(62,44,30,.07);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.post-link:hover{ transform:translateY(-3px); box-shadow:0 8px 16px rgba(62,44,30,.12); }
+/* the big number, in the room's colour — 1., 2., 3. … */
+.post-link::before{
+  content:counter(postnum);
+  position:absolute; left:16px; top:22px;
+  font-family:'Baloo 2',cursive; font-weight:700; font-size:1.25rem;
+  color:var(--room,var(--fur));
+}
+.p-top{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+.p-title{ font-family:'Baloo 2',cursive; font-weight:700; font-size:1.1rem; }
+.p-date{ font-size:.75rem; color:var(--faint); white-space:nowrap; }
+.p-desc{ display:block; margin-top:6px; font-size:.93rem; color:#6d5b45; }
+.p-more{ display:inline-block; margin-top:10px; font-size:.82rem; font-weight:600; color:var(--room,var(--fur)); }
+
+.post-empty{ background:var(--cream); border:2px dashed var(--card-border); border-radius:16px;
+  padding:22px 20px; color:var(--faint); font-style:italic; }
+.post-empty-hint{ display:block; margin-top:6px; font-style:normal; font-size:.85rem; }
+
+/* ============================================================
+   A single post : the reading page (post.html)
+   ============================================================ */
+.post-page{ max-width:680px; margin:0 auto; }
+.post-kicker{ display:inline-block; font-family:'Baloo 2',cursive; font-weight:700;
+  font-size:.78rem; letter-spacing:.4px; text-transform:lowercase;
+  padding:4px 12px; border-radius:12px; background:var(--cream);
+  border:1px solid var(--card-border); color:var(--room,var(--fur)); }
+.post-title{ font-size:clamp(1.9rem,5.5vw,2.7rem); margin:14px 0 4px; }
+.post-date2{ font-size:.85rem; color:var(--faint); margin-bottom:6px; }
+.post-lead{ font-family:'Baloo 2',cursive; font-weight:600; font-size:1.18rem;
+  color:var(--room,var(--fur-d)); margin:16px 0; }
+.post-pic{ margin:22px 0; }
+.post-pic img{ width:100%; height:auto; display:block; border-radius:8px;
+  border:8px solid #fff; box-shadow:0 8px 18px rgba(62,44,30,.16);
+  transform:rotate(-1deg); }
+.post-cap{ text-align:center; font-family:'Baloo 2',cursive; font-weight:600;
+  font-size:.85rem; color:var(--faint); margin-top:10px; }
+.post-body2 p{ color:#3f3123; margin-bottom:18px; }
+
+/* flavour: letter — handwritten, like a note slipped into a book sleeve */
+.flavour-letter .post-title{ font-family:'Caveat',cursive; font-weight:600;
+  font-size:clamp(2.3rem,6vw,3.1rem); }
+.flavour-letter .post-body2{ font-family:'Caveat',cursive; font-size:1.4rem;
+  line-height:1.5; color:#493726; }
+.flavour-letter .post-body2 p{ margin-bottom:14px; }
+/* flavour: poem — airy, centred, shorter lines */
+.flavour-poem .post-title{ text-align:center; }
+.flavour-poem .post-lead{ text-align:center; }
+.flavour-poem .post-body2{ max-width:46ch; margin:0 auto; text-align:center; }
+/* flavour: festival — big taped title, like a cork-board pole */
+.flavour-festival .post-title{ display:inline-block; padding:4px 20px; border-radius:6px;
+  background:var(--room,var(--mustard)); color:#fff; transform:rotate(-1.2deg);
+  box-shadow:0 2px 5px rgba(62,44,30,.2); margin-top:18px; }
+.flavour-festival .post-lead{ margin-top:20px; }
+
+/* a post that wandered off */
+.missing{ text-align:center; color:var(--faint); padding:40px 0; }
+.missing .big{ font-family:'Baloo 2',cursive; font-weight:700; font-size:1.5rem; color:var(--ink); }
+
+/* ============================================================
+   The writing nook (writer.html — your private tool)
+   ============================================================ */
+.nook-note{ color:#6d5b45; max-width:60ch; margin-bottom:26px; }
+.nook-grid{ display:grid; grid-template-columns:1fr 1fr; gap:22px; align-items:start; }
+@media (max-width:860px){ .nook-grid{ grid-template-columns:1fr; } }
+
+/* little choice chips (room / flavour / photo) */
+.pick{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.pick input{ position:absolute; opacity:0; pointer-events:none; }
+.pick label{ display:inline-block; padding:7px 14px; border-radius:16px; cursor:pointer;
+  background:var(--cream); border:2px solid var(--card-border);
+  font-weight:600; font-size:.9rem; color:var(--ink); }
+.pick label:hover{ background:var(--paw); }
+.pick input:checked + span{ background:var(--accent); color:#fff; border-radius:16px; }
+
+.form-box textarea.nook-big{ min-height:260px; }
+.form-box .hint{ font-size:.78rem; color:var(--faint); display:block; margin:-8px 0 12px; }
+.form-box input[type=text].nook-link{ width:100%; max-width:none; }
+
+.manage-title{ font-family:'Baloo 2',cursive; font-weight:700; font-size:1.15rem; margin:8px 0 12px; }
+.manage-item{ display:flex; align-items:center; justify-content:space-between; gap:12px;
+  background:var(--cream); border:2px solid var(--card-border); border-radius:12px;
+  padding:11px 14px; margin-bottom:10px; }
+.manage-item .mi-title{ font-weight:700; }
+.manage-item .mi-meta{ font-size:.76rem; color:var(--faint); margin-top:2px; }
+.unpub{ background:none; border:1px solid var(--card-border); border-radius:14px;
+  padding:5px 12px; font-family:'Nunito',sans-serif; font-size:.8rem;
+  color:var(--fur-d); cursor:pointer; white-space:nowrap; }
+.unpub:hover{ background:#fff; }
