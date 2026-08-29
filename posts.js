@@ -13,7 +13,6 @@
 const POSTS_URL = "https://script.google.com/macros/s/AKfycbwiGVGcNqYDgmXg2njFVMOrpuYKmQBbqbvV-kzTvsfZh2kF560SqXaDUJyG9CM37mMW/exec";
 
 const POSTS_CACHE_KEY = 'postsCache_v1';
-const POSTS_CACHE_TTL = 4 * 60 * 1000;   // remember for 4 minutes
 
 // ---- tiny cache helpers ----
 function loadCachedPosts() {
@@ -25,36 +24,27 @@ function loadCachedPosts() {
 function saveCachedPosts(posts) {
   try { localStorage.setItem(POSTS_CACHE_KEY, JSON.stringify({ t: Date.now(), posts })); } catch (e) {}
 }
-function cacheAge() {
-  try {
-    const raw = JSON.parse(localStorage.getItem(POSTS_CACHE_KEY));
-    return Date.now() - Number(raw.t || 0);
-  } catch (e) { return 1e9; }
-}
 
 // ---- the main reader ----
 // fetchPosts(room, onUpdate)
 //  · room      — 'thoughts' / 'books' / 'voices' (or leave empty for all)
-//  · onUpdate  — optional; called again when newer posts arrive in background
-// Returns the posts right away (from memory when possible).
+//  · onUpdate  — called again when the freshly-fetched list arrives
+// Returns the posts right away (from memory when possible), then always
+// checks the notebook behind the scenes — so new posts appear fast and
+// deleted ones disappear on every browser, no long stale waits.
 async function fetchPosts(room, onUpdate) {
   const filter = posts => room ? posts.filter(p => p.room === room) : posts;
 
   async function fromServer() {
-    const r = await fetch(POSTS_URL + '?action=posts');
+    const r = await fetch(POSTS_URL + '?action=posts&_=' + Date.now());
     const posts = await r.json();
     saveCachedPosts(posts);
     return posts;
   }
 
   const cached = loadCachedPosts();
-  if (cached && cacheAge() < POSTS_CACHE_TTL) {
-    // fresh memory → instant, and nothing to refresh
-    return filter(cached);
-  }
-
   if (cached) {
-    // a little old → show it now, fetch newer quietly in the background
+    // paint what we know instantly, then quietly fetch the true newest list
     fromServer().then(fresh => onUpdate && onUpdate(filter(fresh))).catch(() => {});
     return filter(cached);
   }

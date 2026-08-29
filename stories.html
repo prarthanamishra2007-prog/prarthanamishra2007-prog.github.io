@@ -60,6 +60,7 @@
 
       <!-- the shelf itself -->
       <h3 class="shelf-title">on the shelf <span id="shelfCount"></span></h3>
+      <button class="shelf-manage" id="shelfManage">…manage the shelf (owners only)</button>
       <div class="shelf" id="shelf"></div>
 
       <div style="height:34px"></div>
@@ -99,6 +100,13 @@
 
   function connected(){ return SHELF_URL.indexOf('PASTE') === -1; }
 
+  // -- owner mode: with the shelf key, Prarthana can remove ANY note.
+  //    (the key is typed in, never shown on the page, and remembered
+  //    only in this tab's memory)
+  const OWNER_KEY = 'prarthana-pours-the-tea';
+  let ownerMode = false;
+  try { ownerMode = sessionStorage.getItem('shelfOwner') === '1'; } catch (e) {}
+
   // -- the receipts: ids of notes pinned on THIS device.
   //    Keys are stored on the visitor's own browser only, so only
   //    their device can offer a "take it down" button.
@@ -107,17 +115,39 @@
 
   // -- build one little note card --
   function noteCard(n){
-    const receipts = getReceipts();
-    const mine = receipts.indexOf(n.id) !== -1;   // did THIS device pin it?
+    const receipts   = getReceipts();
+    const mine       = receipts.indexOf(n.id) !== -1;   // did THIS device pin it?
+    const canRemove  = mine || ownerMode;               // pinned here, or owner managing
     const d = document.createElement('div');
     d.className = 'note';
     d.id = 'note-' + n.id;
     d.innerHTML = '<div class="who">' + n.name + '</div>' +
                   '<div class="msg">' + n.message + '</div>' +
                   '<div class="when">pinned ' + n.time + '</div>' +
-                  (mine ? '<button class="note-remove" data-id="' + n.id + '">take it down ✕</button>' : '');
+                  (canRemove ? '<button class="note-remove" data-id="' + n.id + '">' + (ownerMode ? '✕ remove' : 'take it down ✕') + '</button>' : '');
     return d;
   }
+
+  // owner manages: prompts for the key, then every note gets a ✕
+  document.getElementById('shelfManage').addEventListener('click', () => {
+    if (ownerMode){
+      ownerMode = false;
+      try { sessionStorage.removeItem('shelfOwner'); } catch (e) {}
+      document.getElementById('pinStatus').textContent = 'owner mode off';
+      loadShelf();
+      return;
+    }
+    const k = prompt('owner only — type the shelf key:');
+    if (!k) return;
+    if (k === OWNER_KEY){
+      ownerMode = true;
+      try { sessionStorage.setItem('shelfOwner', '1'); } catch (e) {}
+      document.getElementById('pinStatus').textContent = 'owner mode on — every note now has a ✕ for you';
+      loadShelf();
+    } else {
+      document.getElementById('pinStatus').textContent = 'that\'s not the shelf key 🦊';
+    }
+  });
 
   // -- fetch every note from the sheet --
   async function loadShelf(){
@@ -127,7 +157,7 @@
       return;
     }
     try{
-      const r  = await fetch(SHELF_URL, { method:'GET' });
+      const r  = await fetch(SHELF_URL + '?_=' + Date.now(), { method:'GET' });
       const ns = await r.json();
       shelf.innerHTML = '';
       ns.forEach(n => shelf.appendChild(noteCard(n)));
@@ -168,16 +198,20 @@
     // (let the browser send the form itself — no more blocked requests)
   });
 
-  // -- take a note down (only ones this device pinned) --
+  // -- take a note down (only ones this device pinned, or the owner) --
   function takeDown(id){
-    if (!confirm('take this note down? it\'s only yours to remove.')) return;
+    const asOwner = ownerMode;
+    if (!confirm(asOwner ? 'remove this note for good?' : 'take this note down? it\'s only yours to remove.')) return;
     const f = document.createElement('form');
     f.method = 'POST'; f.action = SHELF_URL; f.target = 'shelfTarget';
     const a = document.createElement('input'); a.type = 'hidden'; a.name = 'action'; a.value = 'delete'; f.appendChild(a);
     const i = document.createElement('input'); i.type = 'hidden'; i.name = 'id'; i.value = id; f.appendChild(i);
+    if (asOwner){
+      const k = document.createElement('input'); k.type = 'hidden'; k.name = 'key'; k.value = OWNER_KEY; f.appendChild(k);
+    }
     document.body.appendChild(f);
     iframe.onload = () => {
-      document.getElementById('pinStatus').textContent = 'taken down ✦';
+      document.getElementById('pinStatus').textContent = 'removed from the shelf ✦';
       loadShelf();
     };
     f.submit();
