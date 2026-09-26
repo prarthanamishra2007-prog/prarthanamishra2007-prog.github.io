@@ -1,0 +1,20 @@
+# secrets - never commit
+api_cloudfare.txt
+.env
+.env.*
+*.key
+*.pem
+
+# Apps Script source - server-side only, must never be published
+back-office/
+*.gs
+*.gs.html
+
+# os / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# dependencies
+node_modules/
