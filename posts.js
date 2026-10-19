@@ -1,14 +1,3 @@
-// ============================================================
-// posts.js — the little reader that fetches YOUR writing
-// from the Google notebook and hands it to the room pages,
-// the post pages, and the homepage peeks.
-//
-// The URL below must match the one in stories.html (SHELF_URL).
-//
-// SPEED TRICK: your posts are remembered in the browser for a
-// few minutes, so repeat visits paint instantly — the page shows
-// what it already knows, then quietly refreshes in the background.
-// ============================================================
 
 const POSTS_URL = "https://script.google.com/macros/s/AKfycbwiGVGcNqYDgmXg2njFVMOrpuYKmQBbqbvV-kzTvsfZh2kF560SqXaDUJyG9CM37mMW/exec";
 
@@ -25,13 +14,7 @@ function saveCachedPosts(posts) {
   try { localStorage.setItem(POSTS_CACHE_KEY, JSON.stringify({ t: Date.now(), posts })); } catch (e) {}
 }
 
-// ---- the main reader ----
-// fetchPosts(room, onUpdate)
-//  · room      — 'thoughts' / 'books' / 'voices' (or leave empty for all)
-//  · onUpdate  — called again when the freshly-fetched list arrives
-// Returns the posts right away (from memory when possible), then always
-// checks the notebook behind the scenes — so new posts appear fast and
-// deleted ones disappear on every browser, no long stale waits.
+
 async function fetchPosts(room, onUpdate) {
   const filter = posts => room ? posts.filter(p => p.room === room) : posts;
 
